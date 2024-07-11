@@ -1,35 +1,37 @@
-import { Alert, FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
+import { Alert, FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { Participant } from "../../components/Participant";
 
 import { styles } from "./styles";
 
+function ListEmptyComponent() {
+  return (
+    <Text style={styles.listEmptyStyle}>
+      Nenhum participante cadastrado. Adicione participantes para o evento.
+    </Text>
+  );
+}
+
 export function Home() {
-  const [participants, setParticipants] = useState<string[]>([
-    "Participante 1",
-    "Participante 2",
-    "Participante 3",
-    "Participante 4",
-    "Participante 5",
-    "Participante 6",
-    "Participante 7",
-    "Participante 8",
-    "Participante 9",
-    "Participante 10",
-    "Participante 11",
-    "Participante 12",
-  ]);
+  const [participantName, setParticipantName] = useState<string>("");
+  const [participants, setParticipants] = useState<string[]>([]);
 
   function handleAddParticipant() {
-    if (participants.includes("Participante 2")) {
-      Alert.alert("Erro", "Participante já cadastrado.");
+    const name = participantName.trim();
+
+    if (participants.includes(name)) {
+      Alert.alert("Participante cadastrado!", `Participante '${name}' já está cadastrado.`);
       return;
     }
+
+    setParticipants(state => [...state, name]);
+
+    setParticipantName("");
   }
 
   function handleRemoveParticipant(name: string) {
-    Alert.alert("Remover participante", `Deseja remover o participante ${name}?`, [
+    Alert.alert("Remover participante", `Deseja remover o participante '${name}'?`, [
       {
         text: "Cancelar",
         style: "cancel",
@@ -56,9 +58,11 @@ export function Home() {
       }}>
         <View style={styles.form}>
           <TextInput
-            style={styles.input}
+            onChangeText={setParticipantName}
             placeholder="Nome do participante"
             placeholderTextColor={"#6b6b6b"}
+            style={styles.input}
+            value={participantName}
           />
 
           <TouchableOpacity
@@ -75,13 +79,9 @@ export function Home() {
           }}
           data={participants}
           renderItem={({ item }) => (
-            <Participant name={item} onRemove={handleRemoveParticipant}/>
+            <Participant name={item} onRemove={handleRemoveParticipant} />
           )}
-          ListEmptyComponent={() => (
-            <Text style={styles.listEmptyStyle}>
-              Nenhum participante cadastrado. Adicione participantes para o evento.
-            </Text>
-          )}
+          ListEmptyComponent={ListEmptyComponent}
           showsVerticalScrollIndicator={false}
         />
       </View>
